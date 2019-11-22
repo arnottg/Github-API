@@ -29,3 +29,26 @@ gitDF = jsonlite::fromJSON(jsonlite::toJSON(extContent))
 
 # Subset data.frame
 gitDF[gitDF$full_name == "arnottg/datasharing", "created_at"]
+
+
+
+# The following code is used to interrogate the Github API and return some basic information
+#eg: number of followers, number following, my public repositories
+
+myData = GET("https://api.github.com/users/arnottg", gtoken)
+myDataContent = content(myData)
+myDataDF = jsonlite::fromJSON(jsonlite::toJSON(myDataContent))
+myDataDF$followers
+myDataDF$following
+myDataDF$public_repos
+
+##The followuing code is used to interrogate the Github API to return the same basic info about
+# one of my classmates.
+
+otherData = GET("https://api.github.com/users/junghenp", gtoken)
+otherDataContent = content(otherData)
+otherDataDF = jsonlite::fromJSON(jsonlite::toJSON(otherDataContent))
+otherDataDF$followers
+otherDataDF$following
+otherDataDF$public_repos
+

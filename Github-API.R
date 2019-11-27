@@ -66,4 +66,16 @@ repos$name #names of Repos
 repos$created_at #Repo Creation date 
 repos$full_name #names of repos
 
-myDataDF$bio #My Bio
+myDataDF$bio #My Bio (Currently Empty)
+
+## The following code is an example of how to get commit messages using my
+# own account - this also shows the number of commits by the number of lines outputted
+
+lca <- fromJSON("https://api.github.com/repos/arnottg/Lowest-Common-Ancestor/commits")
+
+
+lca$commit$message
+
+
+# Created Plotly Account - username = arnottg
+

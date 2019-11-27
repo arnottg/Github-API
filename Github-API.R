@@ -30,7 +30,7 @@ gitDF = jsonlite::fromJSON(jsonlite::toJSON(extContent))
 # Subset data.frame
 gitDF[gitDF$full_name == "arnottg/datasharing", "created_at"]
 
-
+#above code sourced from https://towardsdatascience.com/accessing-data-from-github-api-using-r-3633fb62cb08
 
 # The following code is used to interrogate the Github API and return some basic information
 #eg: number of followers, number following, my public repositories
@@ -52,3 +52,18 @@ otherDataDF$followers
 otherDataDF$following
 otherDataDF$public_repos
 
+##The following gives real info about my account -> names of my followers, names of people i'm following,
+#names of my repos
+
+followers = fromJSON("https://api.github.com/users/arnottg/followers")
+followers$login #usernames of followers
+
+following = fromJSON("https://api.github.com/users/arnottg/following")
+following$login #usernames of following
+
+repos = fromJSON("https://api.github.com/users/arnottg/repos") #My repo info
+repos$name #names of Repos
+repos$created_at #Repo Creation date 
+repos$full_name #names of repos
+
+myDataDF$bio #My Bio

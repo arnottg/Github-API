@@ -69,13 +69,103 @@ repos$full_name #names of repos
 myDataDF$bio #My Bio (Currently Empty)
 
 ## The following code is an example of how to get commit messages using my
-# own account - this also shows the number of commits by the number of lines outputted
+# own account - this also shows the number of commits through the nrow function
 
 lca <- fromJSON("https://api.github.com/repos/arnottg/Lowest-Common-Ancestor/commits")
 
 
 lca$commit$message
+nrow(lca$commit)
 
 
 # Created Plotly Account - username = arnottg
+
+##Visualisations: I chose to use Siddharth Dushantha's (sdushantha - creator of the Sherlock Project to find usernames across social
+#Media Platforms) Github to produce social graphs as their data is likely a lot more interesting than my own.
+
+data = GET("https://api.github.com/users/sdushantha/followers?per_page=100;", gtoken)
+stop_for_status(data)
+extract = content(data)
+#converts Github data into a Data Frame in R
+githubDB = jsonlite::fromJSON(jsonlite::toJSON(extract))
+#prints out a list of the first 100 followers of sdushantha
+githubDB$login
+
+# Adding these usernames to a vector
+ids = githubDB$login
+userIds = c(ids)
+
+# Creates vector and df to be used to store users
+users = c()
+usersDF = data.frame(
+  username = integer(),
+  noFollowing = integer(),
+  noFollowers = integer(),
+  repos = integer(),
+  dateCreated = integer()
+)
+
+
+
+
+#loops through users in userIds DF and adds them to users vector and usersDF
+for(i in 1:length(userIds))
+{
+  
+  followingURL = paste("https://api.github.com/users/", userIds[i], "/following", sep = "")
+  followingRequest = GET(followingURL, gtoken)
+  followingContent = content(followingRequest)
+  
+  #If users don't have any followers then they aren't of much use - they won't be added
+  if(length(followingContent) == 0)
+  {
+    next
+  }
+  
+  followingDF = jsonlite::fromJSON(jsonlite::toJSON(followingContent))
+  followingLogin = followingDF$login
+  
+  #Loop through 'following' users
+  for (j in 1:length(followingLogin))
+  {
+    #Check for duplicate users
+    if (is.element(followingLogin[j], users) == FALSE)
+    {
+      #Adds user to the users vector
+      users[length(users) + 1] = followingLogin[j]
+      
+      #Interrogate API to obtain information from each user
+      followingUrl2 = paste("https://api.github.com/users/", followingLogin[j], sep = "")
+      following2 = GET(followingUrl2, gtoken)
+      followingContent2 = content(following2)
+      followingDF2 = jsonlite::fromJSON(jsonlite::toJSON(followingContent2))
+      
+      #Retrieves who the user is following
+      followingNumber = followingDF2$following
+      
+      #Retrieves who follows the user
+      followersNumber = followingDF2$followers
+      
+      #Retrieves how many repositories the user has 
+      reposNumber = followingDF2$public_repos
+      
+      #Retrieve year which each user joined Github
+      yearCreated = substr(followingDF2$created_at, start = 1, stop = 4)
+      
+      #Add users data to a new row in dataframe
+      usersDF[nrow(usersDF) + 1, ] = c(followingLogin[j], followingNumber, followersNumber, reposNumber, yearCreated)
+      
+    }
+    next
+  }
+  #Stop when there are more than 150 users
+  if(length(users) > 150)
+  {
+    break
+  }
+  next
+}
+
+
+length(users)
 

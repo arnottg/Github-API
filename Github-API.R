@@ -81,7 +81,7 @@ lca <- fromJSON("https://api.github.com/repos/arnottg/Lowest-Common-Ancestor/com
 
 lca$commit$message
 nrow(lca$commit)
-
+length(lca$comments_url)
 
 # Created Plotly Account - username = arnottg
 
@@ -191,4 +191,76 @@ plot2
 
 
 
+
+
+
+
+
+#below code is to graph the top 10 most popular languages used by the same 250 users.
+languages = c()
+#h = data.frame()
+for (i in 1:length(users))
+{
+  RepositoriesUrl = paste("https://api.github.com/users/", users[i], "/repos", sep = "")
+  Repositories = GET(RepositoriesUrl, gtoken)
+  RepositoriesContent = content(Repositories)
+  RepositoriesDF = jsonlite::fromJSON(jsonlite::toJSON(RepositoriesContent))
+  RepositoriesNames = RepositoriesDF$name
+  
+  #Loop through all the repositories of an individual user
+  for (j in 1: length(RepositoriesNames))
+  {
+    
+    #Find all repositories and save in data frame
+    RepositoriesUrl2 = paste("https://api.github.com/repos/", users[i], "/", RepositoriesNames[j], sep = "")
+    Repositories2 = GET(RepositoriesUrl2, gtoken)
+    RepositoriesContent2 = content(Repositories2)
+    RepositoriesDF2 = jsonlite::fromJSON(jsonlite::toJSON(RepositoriesContent2))
+    language = RepositoriesDF2$language
+    #h = rbind(h, RepositoriesDF2$comments_url)
+    
+    #Removes repositories containing no specific languages
+    if (length(language) != 0 && language != "<NA>")
+    {
+      languages[length(languages)+1] = language
+    }
+    next
+  }
+  next
+}
+
+#h
+#Prints the length of the language vector
+length(languages)
+
+#Puts 10 most popular languages in table 
+allLanguages = sort(table(languages), increasing=TRUE)
+top10Languages = as.data.frame(allLanguages[(length(allLanguages)-9):length(allLanguages)])
+
+
+
+# x = cbind(top10Languages, rep(0))
+# 
+# for(i in 1:length(RepositoriesDF2)){
+#   for(k in 1:10){
+#     if(x$languages[k] == RepositoriesDF2$language[i]){
+#       print("hi")
+#     }
+#   }
+#   
+# }
+# for(i in 1:10){
+#   x[i,3] = x[i,3]/x[i,2]
+# }
+# x
+#converts to dataframe
+languageDF = as.data.frame(top10Languages)
+
+#Plot 3 - top 10 languages from these users
+plot3 <- plot_ly(data = languageDF, labels = ~languageDF$languages, values = ~languageDF$Freq, type = 'pie')
+plot3
+
+#api_create(plot1, filename = "Followers vs Following")
+api_create(plot2, filename = "Followers vs Repositories")
+api_create(plot3, filename = "10 Most Popular Languages")
 

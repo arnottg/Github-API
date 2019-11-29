@@ -12,9 +12,9 @@ if(!require("jsonlite"))install.packages("jsonlite")
 oauth_endpoints("github")
 
 # Change based on what you
-myapp <- oauth_app(appname = "CS3012_Access_API",
-                   key = "322cc5e338050d04a076",
-                   secret = "ad15687363f7c3bf5c0376fb0e2298c81db6528f")
+myapp <- oauth_app(appname = "gitInterrogation",
+                   key = "b8e681e367792e61c7cb",
+                   secret = "03aef5aadcba1e164865cedc44f3c6f4fb35d3d5")
 
 # Get OAuth credentials
 github_token <- oauth2.0_token(oauth_endpoints("github"), myapp)
@@ -50,7 +50,7 @@ myDataDF$public_repos
 ##The followuing code is used to interrogate the Github API to return the same basic info about
 # one of my classmates.
 
-otherData = GET("https://api.github.com/users/junghenp", gtoken)
+otherData = GET("https://api.github.com/users/junghenp?client_id=b8e681e367792e61c7cb&client_secret=03aef5aadcba1e164865cedc44f3c6f4fb35d3d5")
 otherDataContent = content(otherData)
 otherDataDF = jsonlite::fromJSON(jsonlite::toJSON(otherDataContent))
 otherDataDF$followers
@@ -88,7 +88,7 @@ length(lca$comments_url)
 ##Visualisations: I chose to use Siddharth Dushantha's (sdushantha - creator of the Sherlock Project to find usernames across social
 #Media Platforms) Github to produce social graphs as their data is likely a lot more interesting than my own.
 
-data = GET("https://api.github.com/users/sdushantha/followers?per_page=100;", gtoken)
+data = GET("https://api.github.com/users/sdushantha/followers?per_page=100;?client_id=b8e681e367792e61c7cb&client_secret=03aef5aadcba1e164865cedc44f3c6f4fb35d3d5")
 stop_for_status(data)
 extract = content(data)
 #converts Github data into a Data Frame in R
@@ -117,8 +117,8 @@ usersDF = data.frame(
 for(i in 1:length(userIds))
 {
   
-  followingURL = paste("https://api.github.com/users/", userIds[i], "/following", sep = "")
-  followingRequest = GET(followingURL, gtoken)
+  followingURL = paste("https://api.github.com/users/", userIds[i], "/following?client_id=b8e681e367792e61c7cb&client_secret=03aef5aadcba1e164865cedc44f3c6f4fb35d3d5", sep = "")
+  followingRequest = GET(followingURL)
   followingContent = content(followingRequest)
   
   #If users don't have any followers then they aren't of much use - they won't be added
@@ -140,8 +140,8 @@ for(i in 1:length(userIds))
       users[length(users) + 1] = followingLogin[j]
       
       #Interrogate API to obtain information from each user
-      followingUrl2 = paste("https://api.github.com/users/", followingLogin[j], sep = "")
-      following2 = GET(followingUrl2, gtoken)
+      followingUrl2 = paste("https://api.github.com/users/", followingLogin[j],"?client_id=b8e681e367792e61c7cb&client_secret=03aef5aadcba1e164865cedc44f3c6f4fb35d3d5", sep = "")
+      following2 = GET(followingUrl2)
       followingContent2 = content(following2)
       followingDF2 = jsonlite::fromJSON(jsonlite::toJSON(followingContent2))
       
@@ -201,8 +201,8 @@ languages = c()
 #h = data.frame()
 for (i in 1:length(users))
 {
-  RepositoriesUrl = paste("https://api.github.com/users/", users[i], "/repos", sep = "")
-  Repositories = GET(RepositoriesUrl, gtoken)
+  RepositoriesUrl = paste("https://api.github.com/users/", users[i], "/repos?client_id=b8e681e367792e61c7cb&client_secret=03aef5aadcba1e164865cedc44f3c6f4fb35d3d5", sep = "")
+  Repositories = GET(RepositoriesUrl)
   RepositoriesContent = content(Repositories)
   RepositoriesDF = jsonlite::fromJSON(jsonlite::toJSON(RepositoriesContent))
   RepositoriesNames = RepositoriesDF$name
@@ -212,12 +212,12 @@ for (i in 1:length(users))
   {
     
     #Find all repositories and save in data frame
-    RepositoriesUrl2 = paste("https://api.github.com/repos/", users[i], "/", RepositoriesNames[j], sep = "")
-    Repositories2 = GET(RepositoriesUrl2, gtoken)
+    RepositoriesUrl2 = paste("https://api.github.com/repos/", users[i], "/",  RepositoriesNames[j], "/?client_id=b8e681e367792e61c7cb&client_secret=03aef5aadcba1e164865cedc44f3c6f4fb35d3d5",sep = "")
+    Repositories2 = GET(RepositoriesUrl2)
     RepositoriesContent2 = content(Repositories2)
     RepositoriesDF2 = jsonlite::fromJSON(jsonlite::toJSON(RepositoriesContent2))
     language = RepositoriesDF2$language
-    #h = rbind(h, RepositoriesDF2$comments_url)
+    #h = cbind(h, RepositoriesDF2$commits_url)
     
     #Removes repositories containing no specific languages
     if (length(language) != 0 && language != "<NA>")
@@ -229,9 +229,12 @@ for (i in 1:length(users))
   next
 }
 
-#h
+#ncol(h)
+
+#head(h)
 #Prints the length of the language vector
 length(languages)
+
 
 #Puts 10 most popular languages in table 
 allLanguages = sort(table(languages), increasing=TRUE)
@@ -239,18 +242,18 @@ top10Languages = as.data.frame(allLanguages[(length(allLanguages)-9):length(allL
 
 
 
-# x = cbind(top10Languages, rep(0))
-# 
+#x = cbind(top10Languages, rep(0))
+ 
 # for(i in 1:length(RepositoriesDF2)){
 #   for(k in 1:10){
-#     if(x$languages[k] == RepositoriesDF2$language[i]){
-#       print("hi")
-#     }
+#      if(x$languages[k] == RepositoriesDF2$language[i]){
+#        print("hi")
+#      }
 #   }
-#   
+#    
 # }
-# for(i in 1:10){
-#   x[i,3] = x[i,3]/x[i,2]
+#  for(i in 1:10){
+#    x[i,3] = x[i,3]/x[i,2]
 # }
 # x
 #converts to dataframe
@@ -260,7 +263,10 @@ languageDF = as.data.frame(top10Languages)
 plot3 <- plot_ly(data = languageDF, labels = ~languageDF$languages, values = ~languageDF$Freq, type = 'pie')
 plot3
 
-#api_create(plot1, filename = "Followers vs Following")
+api_create(plot1, filename = "Followers vs Following")
 api_create(plot2, filename = "Followers vs Repositories")
 api_create(plot3, filename = "10 Most Popular Languages")
+
+##Attempted to make an average commits vs Repo Language graph & an average merges vs Repo Language graph
+#But the Github API only allows a certain number of entries per webpage so this was not possible
 

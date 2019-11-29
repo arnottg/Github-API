@@ -1,17 +1,18 @@
-#install.packages("jsonlite")
-library(jsonlite)
-#install.packages("httpuv")
-library(httpuv)
-#install.packages("httr")
-library(httr)
-install.packages("ggplot2")
-install.packages("plotly")
-require(devtools)
-library(plotly)
+if(!require("httpuv"))install.packages("httpuv")
 
+if(!require("ggplot2"))install.packages("ggplot2")
+if(!require("plotly"))install.packages("plotly")
+if(!require("httr"))install.packages("httr")
+if(!require("devtools"))install.packages("devtools")
+
+if(!require("jsonlite"))install.packages("jsonlite")
+
+
+# Can be github, linkedin etc depending on application
 oauth_endpoints("github")
 
-myapp <- oauth_app(appname = "Access_Github",
+# Change based on what you
+myapp <- oauth_app(appname = "CS3012_Access_API",
                    key = "322cc5e338050d04a076",
                    secret = "ad15687363f7c3bf5c0376fb0e2298c81db6528f")
 
@@ -178,11 +179,13 @@ length(users)
 Sys.setenv("plotly_username"="arnottg")
 Sys.setenv("plotly_api_key"="ecH9HI95GOgDaNkeOTFN")
 
-#plot two graphs following vs followers again coloured by year
-plot1 = plot_ly(data = usersDF, x = ~following, y = ~followers, text = ~paste("Followers: ", followers, "<br>Following: ", following), color = ~yearCreated)
+#plot 1 - graphs following vs followers again coloured by year
+plot1 = plot_ly(data = usersDF, x = ~noFollowing, y = ~noFollowers, text = ~paste("Followers: ", noFollowers, "<br>Following: ", noFollowing), color = ~yearCreated)
 plot1
 
-
+#plot 2 - graphs repositories vs followers coloured by year
+plot2 = plot_ly(data = usersDF, x = ~repos, y = ~noFollowers, text = ~paste("Followers: ", noFollowers, "<br>Repositories: ", repos, "<br>Date Created:", yearCreated), color = ~yearCreated)
+plot2
 
 
 

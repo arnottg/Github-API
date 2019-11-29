@@ -4,6 +4,10 @@ library(jsonlite)
 library(httpuv)
 #install.packages("httr")
 library(httr)
+install.packages("ggplot2")
+install.packages("plotly")
+require(devtools)
+library(plotly)
 
 oauth_endpoints("github")
 
@@ -66,7 +70,7 @@ repos$name #names of Repos
 repos$created_at #Repo Creation date 
 repos$full_name #names of repos
 
-myDataDF$bio #My Bio (Currently Empty)
+myDataDF$bio #My Bio
 
 ## The following code is an example of how to get commit messages using my
 # own account - this also shows the number of commits through the nrow function
@@ -102,7 +106,7 @@ usersDF = data.frame(
   noFollowing = integer(),
   noFollowers = integer(),
   repos = integer(),
-  dateCreated = integer()
+  yearCreated = integer()
 )
 
 
@@ -168,4 +172,20 @@ for(i in 1:length(userIds))
 
 
 length(users)
+
+#Plotly
+#Setting up Plotly for R:
+Sys.setenv("plotly_username"="arnottg")
+Sys.setenv("plotly_api_key"="ecH9HI95GOgDaNkeOTFN")
+
+#plot two graphs following vs followers again coloured by year
+plot1 = plot_ly(data = usersDF, x = ~following, y = ~followers, text = ~paste("Followers: ", followers, "<br>Following: ", following), color = ~yearCreated)
+plot1
+
+
+
+
+
+
+
 
